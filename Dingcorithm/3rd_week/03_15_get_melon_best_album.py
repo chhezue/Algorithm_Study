@@ -14,9 +14,6 @@ def get_melon_best_album(genre_array, play_array):
         else:
             song_dict[genre_array[i]] += [(i, play_array[i])]
 
-    print("원본 count_dict:", count_dict)
-    print("원본 song_dict:", song_dict)
-
     # sort: 원본 배열 변경, 리스트만 가능
     # sorted: 새로운 배열 반환, 모든 iterable 가능
     sorted_count_dict = sorted(count_dict.items(), key=lambda x: x[1], reverse=True) # 총 재생 수 내림차순으로 정렬
@@ -24,12 +21,9 @@ def get_melon_best_album(genre_array, play_array):
     # 장르별 곡 목록 정렬
     # song_dict.items()는 (genre, [(index, plays), ...]) 형태의 2 튜플이므로 for문 내에서 다시 정렬해야 함.
     for genre, _ in sorted_count_dict:
-        sorted_songs = sorted(song_dict[genre], key=lambda x: (-x[1], x[0])) # 재생 횟수 내림차순, 인덱스 오름차순으로 정렬
-        for idx, _ in sorted_songs[:2]:  # 존재하는 만큼(최대 2)만 가져옴
+        sorted_song_dict = sorted(song_dict[genre], key=lambda x: (-x[1], x[0])) # 재생 횟수 내림차순, 인덱스 오름차순으로 정렬
+        for idx, _ in sorted_song_dict[:2]: # 정렬된 곡 목록에서 최대 2개의 곡을 가져옴.
             result.append(idx)
-
-    print("정렬된 sorted_count_dict:", sorted_count_dict)
-    print("정렬된 song_dict:", song_dict)
 
     return result
 
