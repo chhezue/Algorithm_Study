@@ -2,15 +2,16 @@ from typing import List
 
 class Solution:
     def dailyTemperatures(self, temperatures: List[int]) -> List[int]:
+        n = len(temperatures)
         stack = []
-        result = [0] * len(temperatures)
+        result = [0] * n
 
-        for i, temp in enumerate(temperatures):
-            while stack and stack[-1][1] < temp:
-                idx, value = stack.pop() # 73일 때 (1, 74)가 꺼내짐.
-                result[idx] = i - idx
+        for i in range(n):
+            while stack and temperatures[stack[-1]] < temperatures[i]:
+                result[stack[-1]] = i - stack[-1]
+                stack.pop()
 
-            stack.append((i, temp)) # (인덱스, 값)
+            stack.append(i)
 
         return result
 

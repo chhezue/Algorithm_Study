@@ -1,20 +1,17 @@
-def top(nums):
-    stack = []
-    result = [0] * len(nums)
-
-    for i in range(len(nums) - 1, -1, -1): # 역순으로
-        # print("i:", i, "nums[i]:", nums[i])
-        while stack and stack[-1][0] < nums[i]:
-            value, idx = stack.pop()
-            result[idx] = i + 1
-
-        stack.append((nums[i], i))
-
-    return result
+import sys
+input = sys.stdin.readline
 
 n = int(input())
-nums = list(map(int, input().split()))
-print(*top(nums))
+arr = list(map(int, input().split())) # [3, 5, 2, 7]
+stack = []
+result = [0] * n
 
-# input: 6 9 5 7 4
-# output: 0 0 2 2 4
+# 배열을 역순으로 검사
+for i in range(n-1, -1, -1):
+    while stack and arr[stack[-1]] < arr[i]:
+        result[stack[-1]] = i + 1
+        stack.pop()
+
+    stack.append(i)
+
+print(*result)
