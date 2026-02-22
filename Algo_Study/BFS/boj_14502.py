@@ -1,62 +1,66 @@
 import sys
 from collections import deque
 from itertools import combinations
+from typing import List
+from copy import deepcopy
 input = sys.stdin.readline
 
-def solution(grid, c, r):
-    result = 0
-    empties = []
+class Solution:
+    def bfs(self, grid, i, j):
+        queue = deque([(i, j)]) # 큐에 시작점을 넣음.
 
-    # 1. 빈칸 목록 저장
-    for i in range(c):
-        for j in range(r):
-            if grid[i][j] == 0:
-                empties.append((i, j))
+        dr = [-1, 0, 1, 0]
+        dc = [0, 1, 0, -1]
 
-    # 2. 빈칸 목록 중 3개 뽑는 조합 반복
-    for walls in combinations(empties, 3):
-        new_grid = [row[:] for row in grid] # 격자 복사
-        for r, c in walls: # 벽 세우기
-            new_grid[r][c] = 1
+        while queue:
+            r, c = queue.popleft()
 
-        count = bfs(new_grid) # 바이러스 BFS + 안전 영역(0) 개수 세기
-        result = max(result, count) # 최댓값 갱신
+            for k in range(4):
+                nr = r + dr[k]
+                nc = c + dc[k]
 
-    return result
-
-# 바이러스 BFS
-def bfs(grid):
-    # 바이러스 모두 찾아 큐에 넣기
-    queue = deque()
-    for i in range(len(grid)):
-        for j in range(len(grid[0])):
-            if grid[i][j] == 2:
-                queue.append((i, j))
-
-    directions = [(1,0), (-1,0), (0,1), (0,-1)]
-    count = 0
-
-    while queue:
-        r, c = queue.popleft()
-
-        for dr, dc in directions:
-            nr, nc = r + dr, c + dc
-
-            if 0 <= nr < len(grid) and 0 <= nc < len(grid[0]):
-                # 바이러스 퍼뜨리기
-                if grid[nr][nc] == 0:
+                if 0 <= nr < len(grid) and 0 <= nc < len(grid[0]) and grid[nr][nc] == 0:
                     grid[nr][nc] = 2
                     queue.append((nr, nc))
 
-    for i in range(len(grid)):
-        for j in range(len(grid[0])):
-            if grid[i][j] == 0:
-                count += 1
+    def findSafetyFromVirus(self, grid: List[List[str]]) -> int:
+        max_safety = 0 # 안전 구역 개수
+        empty = []
 
-    return count
+        # 0인 좌표를 empty 배열에 넣기
+        for i in range(n):
+            for j in range(m):
+                if grid[i][j] == 0:
+                    empty.append((i, j))
 
-c, r = map(int, input().split())
+        # 1. 벽을 세울 3개 조합을 뽑는다.
+        for walls in combinations(empty, 3):
+            new_grid = deepcopy(grid)
+            safety = 0
+
+            # print("뽑힌 조합:", walls)
+            for r, c in walls:
+                new_grid[r][c] = 1
+
+            # 전체 격자를 (0, 0) 부터 끝까지 스캔
+            for i in range(len(grid)):
+                for j in range(len(grid[0])):
+                    if new_grid[i][j] == 2: # 바이러스를 만나면 bfs 시작
+                        self.bfs(new_grid, i, j)
+
+            # 남은 안전 구역의 개수 세기
+            for i in range(len(new_grid)):
+                for j in range(len(new_grid[0])):
+                    if new_grid[i][j] == 0:
+                        safety += 1
+
+            max_safety = max(max_safety, safety)
+
+        return max_safety
+
+n, m = map(int, input().split())
 grid = []
-for _ in range(c):
+for _ in range(n):
     grid.append(list(map(int, input().split())))
-print(solution(grid, c, r))
+
+print(Solution().findSafetyFromVirus(grid))

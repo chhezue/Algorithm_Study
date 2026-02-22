@@ -1,44 +1,39 @@
 from collections import deque
 from typing import List
 
-# 1. BFS는 "하나의 시작점에서 연결된 덩어리"만 탐색한다.
-# 2. 다른 섬을 탐색하고 싶다면 BFS를 새로 호출해야 한다.
-# 3. BFS를 반복적으로 호출하는 흐름은 바깥 루프에서 한다.
 class Solution:
-    def numIslands(self, grid: List[List[str]]) -> int:
-        rows = len(grid)
-        cols = len(grid[0])
-        result = 0
+    def bfs(self, grid, i, j, v):
+        queue = deque([(i, j)]) # 큐에 시작점을 넣음.
+        v[i][j] = True
 
-        visited = [[False] * cols for _ in range(rows)]
-        directions = [(1,0), (-1,0), (0,1), (0,-1)]
-
-        # 전체 grid 순회
-        for r in range(rows):
-            for c in range(cols):
-                # 방문하지 않았고 1이라면 -> 새로운 섬 발견
-                # bfs를 호출해서 그 섬 전체를 visited = True로 만들어야 한다.
-                if not visited[r][c] and grid[r][c] == '1':
-                    self.bfs(grid, visited, directions, r, c)
-                    result += 1
-
-        return result
-
-    # 같은 섬의 땅을 모두 visited = True로 만드는 작업
-    def bfs(self, grid, visited, directions, r, c):
-        queue = deque([(r, c)])
-        visited[r][c] = True
+        dr = [-1, 0, 1, 0]
+        dc = [0, 1, 0, -1]
 
         while queue:
             r, c = queue.popleft()
 
-            for dr, dc in directions:
-                nr, nc = r + dr, c + dc # 상하좌우 모두 탐색
+            for k in range(4):
+                nr = r + dr[k]
+                nc = c + dc[k]
 
-                if 0 <= nr < len(grid) and 0 <= nc < len(grid[0]):
-                    if grid[nr][nc] == '1' and not visited[nr][nc]:
+                if (0 <= nr < len(grid) and 0 <= nc < len(grid[0])
+                        and grid[nr][nc] == "1" and not v[nr][nc]):
                         queue.append((nr, nc))
-                        visited[nr][nc] = True
+                        v[nr][nc] = True
+
+    def numIslands(self, grid: List[List[str]]) -> int:
+        count = 0
+        visited = [[False] * len(grid[0]) for _ in range(len(grid))]
+
+        # 1. 전체 격자를 (0,0) 부터 끝까지 스캔
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                # 2. 아직 방문하지 않은 1을 만나면 BFS 시작, count += 1
+                if grid[i][j] == "1" and not visited[i][j]:
+                    self.bfs(grid, i, j, visited)
+                    count += 1
+
+        return count
 
 s = Solution()
 print(s.numIslands([
