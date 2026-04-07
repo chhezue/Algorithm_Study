@@ -14,25 +14,31 @@ def solution(queue1, queue2):
         return 0
 
     max_count = len(queue1) * 10
-    target_sum = (q1_sum + q2_sum) // 2
 
-    while q1_sum != target_sum and answer < max_count:
-        if q1_sum > q2_sum and q1:
+    while True:
+        # 정답을 찾은 경우
+        if q1_sum == q2_sum:
+            break
+        # 정답을 찾지 못했고, 무한 루프가 발생하는 경우
+        if answer >= max_count:
+            return -1
+
+        # q1의 합이 더 큰 경우, 하나를 빼서 q2에 넣는다.
+        if q1_sum > q2_sum:
             item = q1.popleft()
             q2.append(item)
-        elif q2_sum > q1_sum and q2:
+            q2_sum += item
+            q1_sum -= item
+        elif q1_sum < q2_sum:
             item = q2.popleft()
             q1.append(item)
+            q1_sum += item
+            q2_sum -= item
 
         answer += 1
-        q1_sum = sum(q1)
-        q2_sum = sum(q2)
 
-    if q1_sum != q2_sum:
-        return -1
-    else:
-        return answer
+    return answer
 
-print(solution([3, 2, 7, 2], [4, 6, 5, 1]))
-print(solution([1, 2, 1, 2], [1, 10, 1, 2]))
-print(solution([1, 1], [1, 5]))
+print(solution([3, 2, 7, 2], [4, 6, 5, 1])) # 2
+print(solution([1, 2, 1, 2], [1, 10, 1, 2])) # 7
+print(solution([1, 1], [1, 5])) # -1
